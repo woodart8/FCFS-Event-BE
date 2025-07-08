@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: fcfs
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      timeout: 2000
+      password: qaz112
+
+    mongodb:
+      uri: mongodb://localhost:27017/fcfsdb
+      username: kibeom
+      password: qaz112
+      port: 27017
