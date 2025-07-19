@@ -1,61 +1,61 @@
 package com.woodart8.fcfs.service;
 
-import com.woodart8.fcfs.dto.CouponDto;
-import com.woodart8.fcfs.dto.EventRequestDto;
-import com.woodart8.fcfs.entity.Coupon;
-import com.woodart8.fcfs.repository.CouponRepository;
-import com.woodart8.fcfs.util.CouponCodeGenerator;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.woodart8.fcfs.dto.request.EventRequestDto;
+import com.woodart8.fcfs.dto.response.EventResponseDto;
+import com.woodart8.fcfs.entity.Event;
+import com.woodart8.fcfs.repository.EventRepository;
+import com.woodart8.fcfs.util.converter.EventConfigConverter;
+import com.woodart8.fcfs.util.validator.EventValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class EventService {
 
-    private final CouponRepository couponRepository;
-    private final ReactiveRedisTemplate<String, String> redisTemplate;
+    private final EventRepository eventRepository;
+    private final RedisTemplate<String, String> redisTemplate;
 
-    public EventService(CouponRepository couponRepository,
-                        ReactiveRedisTemplate<String, String> redisTemplate) {
-        this.couponRepository = couponRepository;
+    @Autowired
+    public EventService(EventRepository eventRepository, RedisTemplate<String, String> redisTemplate) {
+        this.eventRepository = eventRepository;
         this.redisTemplate = redisTemplate;
     }
 
-    public Mono<CouponDto> handleEventParticipation(EventRequestDto eventRequest) {
-        return redisTemplate.opsForValue().decrement("event:coupons", 1)
-                .flatMap(remainingCoupons -> {
-                    if (remainingCoupons != null && remainingCoupons > 0) {
-                        return createUniqueCoupon()
-                                .map(CouponDto::from);
-                    } else {
-                        // 쿠폰이 소진된 경우 Mono.empty() 반환
-                        return Mono.empty();
-                    }
-                });
+    public EventResponseDto uploadEvent(EventRequestDto eventRequestDto) {
+        if (!EventValidator.isValidEvent(eventRequestDto)) {
+            throw new IllegalArgumentException();
+        }
+
+        Map<String, Object> config = new HashMap<>();
+        config.put("maxCouponAmount", eventRequestDto.getMaxCouponAmount());
+        String eventConfig = EventConfigConverter.toJson(config);
+
+        Event event = eventRepository.save(
+            Event.of(
+                eventRequestDto.getEventName(),
+                eventConfig,
+                eventRequestDto.getStartDate(),
+                eventRequestDto.getEndDate()
+            )
+        );
+
+        if (eventRequestDto.getMaxCouponAmount() != null) {
+            cacheMaxCouponAmount(event);
+        }
+
+        return EventResponseDto.fromEntity(event);
     }
 
-    private Mono<Coupon> createUniqueCoupon() {
-        return Mono.defer(() -> {
-            String code = CouponCodeGenerator.generateCouponCode(12);
-            return couponRepository.existsByCode(code)
-                    .flatMap(exists -> {
-                        if (exists) {
-                            // 중복이면 재시도
-                            return createUniqueCoupon();
-                        } else {
-                            Coupon coupon = Coupon.builder()
-                                    .code(code)
-                                    .description("이벤트 쿠폰")
-                                    .expirationDate(LocalDateTime.now().plusDays(7))
-                                    .isUsed(false)
-                                    .build();
+    private void cacheMaxCouponAmount(Event event) {
+        JsonNode configNode = EventConfigConverter.fromJson(event.getEventConfig());
+        String maxCouponAmount = configNode.get("maxCouponAmount").asText();
 
-                            return couponRepository.save(coupon);
-                        }
-                    });
-        });
+        redisTemplate.opsForValue().set("event:" + event.getEventId() + ":coupon:max", maxCouponAmount);
     }
 
 }

@@ -1,18 +1,16 @@
 package com.woodart8.fcfs.controller;
 
-import com.woodart8.fcfs.dto.CouponDto;
-import com.woodart8.fcfs.dto.EventRequestDto;
+import com.woodart8.fcfs.dto.request.EventRequestDto;
+import com.woodart8.fcfs.dto.response.EventResponseDto;
 import com.woodart8.fcfs.service.EventService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/event")
+@RequestMapping("/api/v1/events")
 public class EventController {
 
     private final EventService eventService;
@@ -21,11 +19,10 @@ public class EventController {
         this.eventService = eventService;
     }
 
-    @PostMapping("/participate")
-    public Mono<ResponseEntity<CouponDto>> participateInEvent(@RequestBody EventRequestDto eventRequest) {
-        return eventService.handleEventParticipation(eventRequest)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+    // 이벤트 등록
+    @PostMapping
+    public ResponseEntity<EventResponseDto> postEvent(@RequestBody EventRequestDto eventRequestDto) {
+        return ResponseEntity.ok(eventService.uploadEvent(eventRequestDto));
     }
 
 
