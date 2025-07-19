@@ -31,16 +31,9 @@ public class CouponService {
             final Long eventId,
             final CouponRequestDto couponRequestDto
     ) {
-        // 1. 최대 발급 개수 조회
         Mono<Long> maxCouponAmount = reactiveRedisTemplate.opsForValue()
                 .get("event:" + eventId + ":coupon:max")
                 .switchIfEmpty(Mono.error(new RuntimeException("이벤트 최대 쿠폰 수량 정보 없음")))
-                .map(Long::parseLong);
-
-        // 2. 현재 발급 개수 조회
-        Mono<Long> issuedCouponAmount = reactiveRedisTemplate.opsForValue()
-                .get("event:" + eventId + ":coupon:issued")
-                .defaultIfEmpty("0")
                 .map(Long::parseLong);
 
         return reactiveRedisTemplate.opsForValue()
