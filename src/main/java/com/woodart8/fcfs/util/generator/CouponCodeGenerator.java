@@ -1,8 +1,10 @@
-package com.woodart8.fcfs.util;
+package com.woodart8.fcfs.util.generator;
 
 import java.security.SecureRandom;
 
 public class CouponCodeGenerator {
+
+    private CouponCodeGenerator() {}
 
     private static final String CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // 대문자 + 숫자
 
