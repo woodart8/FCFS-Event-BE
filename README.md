@@ -22,5 +22,6 @@
 | - |
 | ![K6](https://img.shields.io/badge/K6-7D64FF.svg?&logo=k6&logoColor=white) |
 
+# 시스템 아키텍쳐 <a id="시스템-아키텍쳐"> 
 
 <img width="1051" height="363" alt="스크린샷 2025-07-30 오전 11 26 37" src="https://github.com/user-attachments/assets/0cd31532-fdfa-40b0-beff-9a3b06589048" />
