@@ -10,8 +10,14 @@
 | - | - |
 | ![Spring Data Reactive MongoDB](https://img.shields.io/badge/Spring_Data_Reactive_MongoDB-47A248.svg) | ![Spring Data Redis](https://img.shields.io/badge/Spring_Data_Redis-FF4438.svg) |
 
-### 2. Database <a id="3-database"></a>
+### 2. Database <a id="2-database"></a>
 
 | MongoDB | Redis |
 | - | - |
 | ![MongoDB](https://img.shields.io/badge/MongoDB-47A248.svg?&logo=mongodb&logoColor=white) | ![Redis](https://img.shields.io/badge/Redis-FF4438.svg?&logo=redis&logoColor=white) |
+
+### 3. Load Testing <a id="3-load-testing"></a>
+
+| K6 |
+| - |
+| ![K6](https://img.shields.io/badge/K6-7D64FF.svg?&logo=k6&logoColor=white) |
