@@ -24,4 +24,6 @@
 
 # 시스템 아키텍쳐 <a id="시스템-아키텍쳐"> 
 
-<img width="1051" height="363" alt="스크린샷 2025-07-30 오전 11 26 37" src="https://github.com/user-attachments/assets/0cd31532-fdfa-40b0-beff-9a3b06589048" />
+<img width="1094" height="519" alt="스크린샷 2025-07-30 오전 11 42 29" src="https://github.com/user-attachments/assets/d0adc7c4-61a0-4ff8-99f0-3881fe0b45c1" />
+
+
