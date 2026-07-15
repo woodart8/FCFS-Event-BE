@@ -10,9 +10,9 @@ import java.time.ZoneId;
 import java.util.Date;
 
 @Document(collection = "coupons")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Data
+@Getter
 @Builder
 public class Coupon {
 

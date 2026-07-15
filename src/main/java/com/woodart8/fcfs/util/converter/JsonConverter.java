@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Map;
 
-public class EventConfigConverter {
+public class JsonConverter {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -15,19 +15,27 @@ public class EventConfigConverter {
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
-    private EventConfigConverter() {}
+    private JsonConverter() {}
 
-    public static String toJson(Map<String, Object> configMap) {
+    public static String toJson(Object object) {
         try {
-            return objectMapper.writeValueAsString(configMap);
+            return objectMapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("JSON 직렬화 실패", e);
         }
     }
 
-    public static JsonNode fromJson(String json) {
+    public static JsonNode readTree(String json) {
         try {
             return objectMapper.readTree(json);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("JSON 역직렬화 실패", e);
+        }
+    }
+
+    public static <T> T fromJson(String json, Class<T> clazz) {
+        try {
+            return objectMapper.readValue(json, clazz);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("JSON 역직렬화 실패", e);
         }

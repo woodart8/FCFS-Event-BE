@@ -10,15 +10,15 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Builder
-public class EventResponseDto {
+public class EventResponse {
 
     Long eventId;
     String eventName;
     LocalDate startDate;
     LocalDate endDate;
 
-    public static EventResponseDto fromEntity(Event event) {
-        return EventResponseDto.builder()
+    public static EventResponse fromEntity(Event event) {
+        return EventResponse.builder()
                 .eventId(event.getEventId())
                 .eventName(event.getEventName())
                 .startDate(event.getStartDate())

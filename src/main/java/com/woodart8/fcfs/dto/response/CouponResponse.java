@@ -10,15 +10,15 @@ import java.time.ZoneId;
 @Getter
 @Setter
 @Builder
-public class CouponResponseDto {
+public class CouponResponse {
 
     private String code;
     private String description;
     private boolean isUsed;
     private LocalDate expirationDate;
 
-    public static CouponResponseDto fromEntity(Coupon coupon) {
-        return new CouponResponseDto(
+    public static CouponResponse fromEntity(Coupon coupon) {
+        return new CouponResponse(
                 coupon.getCode(),
                 coupon.getDescription(),
                 coupon.isUsed(),

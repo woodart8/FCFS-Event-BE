@@ -1,7 +1,7 @@
 package com.woodart8.fcfs.controller;
 
-import com.woodart8.fcfs.dto.request.CouponRequestDto;
-import com.woodart8.fcfs.dto.response.CouponResponseDto;
+import com.woodart8.fcfs.dto.request.CouponRequest;
+import com.woodart8.fcfs.dto.response.CouponResponse;
 import com.woodart8.fcfs.service.CouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,11 +22,11 @@ public class CouponController {
 
     // 쿠폰 발급
     @PostMapping
-    public Mono<ResponseEntity<CouponResponseDto>> postCoupon(
+    public Mono<ResponseEntity<CouponResponse>> postCoupon(
             @RequestParam("eventId") Long eventId,
-            @RequestBody CouponRequestDto couponRequestDto
+            @RequestBody CouponRequest couponRequest
     ) {
-        return couponService.uploadCoupon(eventId, couponRequestDto)
+        return couponService.uploadCoupon(eventId, couponRequest)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
     }

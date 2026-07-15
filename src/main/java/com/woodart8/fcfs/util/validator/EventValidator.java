@@ -1,6 +1,6 @@
 package com.woodart8.fcfs.util.validator;
 
-import com.woodart8.fcfs.dto.request.EventRequestDto;
+import com.woodart8.fcfs.dto.request.EventRequest;
 
 import java.time.LocalDate;
 
@@ -21,10 +21,10 @@ public class EventValidator {
         return maxCouponAmount > 0;
     }
 
-    public static boolean isValidEvent(EventRequestDto eventRequestDto) {
-        return isValidEventName(eventRequestDto.getEventName())
-                && isValidPeriod(eventRequestDto.getStartDate(), eventRequestDto.getEndDate())
-                && isValidMaxCouponAmount(eventRequestDto.getMaxCouponAmount());
+    public static boolean isValidEvent(EventRequest eventRequest) {
+        return isValidEventName(eventRequest.eventName())
+                && isValidPeriod(eventRequest.startDate(), eventRequest.endDate())
+                && isValidMaxCouponAmount(eventRequest.maxCouponAmount());
     }
 
 }
