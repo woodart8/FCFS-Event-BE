@@ -16,14 +16,15 @@
 | - | - | - |
 | ![MariaDB](https://img.shields.io/badge/MariaDB-003545.svg?&logo=mariadb&logoColor=white) | ![MongoDB](https://img.shields.io/badge/MongoDB-47A248.svg?&logo=mongodb&logoColor=white) | ![Redis](https://img.shields.io/badge/Redis-FF4438.svg?&logo=redis&logoColor=white) |
 
-### 3. Load Testing <a id="3-load-testing"></a>
+### 3. Infra & DevOps <a id="3-infra-devops"></a>
 
-| K6 |
-| - |
-| ![K6](https://img.shields.io/badge/K6-7D64FF.svg?&logo=k6&logoColor=white) |
+| Docker | Debezium | K6 |
+| - | - | - |
+| ![Docker](https://img.shields.io/badge/Docker-2496ED.svg?&logo=docker&logoColor=white) | ![Debezium](https://img.shields.io/badge/Debezium-91D443.svg?&logo=debezium&logoColor=white) | ![K6](https://img.shields.io/badge/K6-7D64FF.svg?&logo=k6&logoColor=white) |
 
 # 시스템 아키텍쳐 <a id="시스템-아키텍쳐"> 
+<img width="1692" height="929" alt="시스템 아키텍처" src="https://github.com/user-attachments/assets/d8fe401c-20a9-45e8-bac9-70a3db836f8e" />
 
-<img width="1094" height="519" alt="스크린샷 2025-07-30 오전 11 42 29" src="https://github.com/user-attachments/assets/d0adc7c4-61a0-4ff8-99f0-3881fe0b45c1" />
+
 
 
