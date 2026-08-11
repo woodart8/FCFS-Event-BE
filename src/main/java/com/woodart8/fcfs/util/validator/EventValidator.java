@@ -1,6 +1,6 @@
 package com.woodart8.fcfs.util.validator;
 
-import com.woodart8.fcfs.dto.request.EventRequest;
+import com.woodart8.fcfs.event.dto.request.EventRequest;
 
 import java.time.LocalDate;
 

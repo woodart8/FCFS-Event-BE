@@ -1,0 +1,23 @@
+{
+"connector.class": "io.debezium.connector.mysql.MySqlConnector",
+"tasks.max": "1",
+
+"database.hostname": "mariadb",
+"database.port": "3306",
+"database.user": "root",
+"database.password": "root",
+
+"database.server.id": "184054",
+"database.include.list": "eventdb",
+"table.include.list": "eventdb.outbox",
+
+"topic.prefix": "cdc",
+
+"schema.history.internal.kafka.bootstrap.servers": "kafka:29092",
+"schema.history.internal.kafka.topic": "schema-changes.outbox",
+
+"snapshot.mode": "initial",
+"include.schema.changes": "false",
+
+"tombstones.on.delete": "true"
+}
