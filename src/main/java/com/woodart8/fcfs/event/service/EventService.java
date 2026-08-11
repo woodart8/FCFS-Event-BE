@@ -13,7 +13,6 @@ import com.woodart8.fcfs.util.converter.JsonConverter;
 import com.woodart8.fcfs.util.validator.EventValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
