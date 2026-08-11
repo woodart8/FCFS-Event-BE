@@ -25,7 +25,6 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final OutboxRepository outboxRepository;
-    private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
     public EventResponse uploadEvent(EventRequest eventRequest) {
