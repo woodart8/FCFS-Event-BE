@@ -1,5 +1,6 @@
 package com.woodart8.fcfs.common.config;
 
+import com.woodart8.fcfs.coupon.dto.request.CouponIssueRequest;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -12,6 +13,8 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.*;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,8 +48,36 @@ public class KafkaConfig {
     }
 
     @Bean
+    public ProducerFactory<String, CouponIssueRequest> couponProducerFactory() {
+
+        Map<String, Object> config = new HashMap<>();
+
+        config.put(
+                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                bootstrapServers
+        );
+
+        config.put(
+                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+                StringSerializer.class
+        );
+
+        config.put(
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                JsonSerializer.class
+        );
+
+        return new DefaultKafkaProducerFactory<>(config);
+    }
+
+    @Bean
     public KafkaTemplate<String, String> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
+    }
+
+    @Bean
+    public KafkaTemplate<String, CouponIssueRequest> couponKafkaTemplate() {
+        return new KafkaTemplate<>(couponProducerFactory());
     }
 
     @Bean
@@ -79,12 +110,66 @@ public class KafkaConfig {
     }
 
     @Bean
+    public ConsumerFactory<String, CouponIssueRequest> couponConsumerFactory() {
+
+        Map<String, Object> config = new HashMap<>();
+
+        config.put(
+                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                bootstrapServers
+        );
+
+        config.put(
+                ConsumerConfig.GROUP_ID_CONFIG,
+                "coupon-issue-group"
+        );
+
+        config.put(
+                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
+                "earliest"
+        );
+
+        config.put(
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+                StringDeserializer.class
+        );
+
+        config.put(
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                JsonDeserializer.class
+        );
+
+        return new DefaultKafkaConsumerFactory<>(
+                config,
+                new StringDeserializer(),
+                new JsonDeserializer<>(
+                        CouponIssueRequest.class,
+                        false
+                )
+        );
+    }
+
+    @Bean
     public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
 
         ConcurrentKafkaListenerContainerFactory<String, String> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
 
         factory.setConsumerFactory(consumerFactory());
+
+        return factory;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, CouponIssueRequest> couponKafkaListenerContainerFactory() {
+
+        ConcurrentKafkaListenerContainerFactory<String, CouponIssueRequest>
+                factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+
+        factory.setConsumerFactory(
+                couponConsumerFactory()
+        );
 
         return factory;
     }

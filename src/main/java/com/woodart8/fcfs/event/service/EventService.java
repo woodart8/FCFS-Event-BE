@@ -1,5 +1,6 @@
 package com.woodart8.fcfs.event.service;
 
+import com.woodart8.fcfs.coupon.redis.CouponRedisKey;
 import com.woodart8.fcfs.event.domain.AggregateType;
 import com.woodart8.fcfs.event.domain.EventType;
 import com.woodart8.fcfs.outbox.dto.EventCreatedMessage;

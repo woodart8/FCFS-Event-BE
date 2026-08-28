@@ -20,6 +20,10 @@ public class Coupon {
     private String id;
 
     private Long eventId;
+
+    @Indexed(unique = true)
+    private String requestId;
+
     private String code;
     private String description;
     private boolean isUsed;
@@ -30,12 +34,14 @@ public class Coupon {
 
     public static Coupon of(
             final Long eventId,
+            final String requestId,
             final String code,
             final String description,
             final LocalDate expirationDate
     ) {
         return Coupon.builder()
                 .eventId(eventId)
+                .requestId(requestId)
                 .code(code)
                 .description(description)
                 .isUsed(false)

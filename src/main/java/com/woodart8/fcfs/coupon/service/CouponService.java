@@ -1,71 +1,119 @@
 package com.woodart8.fcfs.coupon.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woodart8.fcfs.coupon.dto.request.CouponIssueRequest;
 import com.woodart8.fcfs.coupon.dto.request.CouponRequest;
-import com.woodart8.fcfs.coupon.dto.response.CouponResponse;
-import com.woodart8.fcfs.coupon.entity.Coupon;
-import com.woodart8.fcfs.coupon.repository.CouponRepository;
-import com.woodart8.fcfs.util.generator.CouponCodeGenerator;
+import com.woodart8.fcfs.coupon.dto.response.CouponReqResponse;
+import com.woodart8.fcfs.coupon.redis.CouponRedisKey;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import java.time.LocalDate;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CouponService {
 
-    private final CouponRepository couponRepository;
     private final ReactiveRedisTemplate<String, String> reactiveRedisTemplate;
+    private final ObjectMapper objectMapper;
+    private final RedisScript<Long> couponReserveScript;
 
-    // 쿠폰 발급 로직
-    public Mono<CouponResponse> uploadCoupon(
-            final Long eventId,
-            final CouponRequest couponRequest
+    public Mono<CouponReqResponse> requestCoupon(
+            Long eventId,
+            Long userId,
+            CouponRequest request
     ) {
-        Mono<Long> maxCouponAmount = reactiveRedisTemplate.opsForValue()
-                .get("event:" + eventId + ":coupon:max")
-                .switchIfEmpty(Mono.error(new RuntimeException("이벤트 최대 쿠폰 수량 정보 없음")))
-                .map(Long::parseLong);
+
+        String requestId = UUID.randomUUID().toString();
+
+        CouponIssueRequest issueRequest =
+                new CouponIssueRequest(
+                        requestId,
+                        eventId,
+                        userId,
+                        request.description(),
+                        request.duration()
+                );
+
+        String value;
+
+        try {
+            value = objectMapper.writeValueAsString(issueRequest);
+        } catch (JsonProcessingException e) {
+            return Mono.error(e);
+        }
 
         return reactiveRedisTemplate.opsForValue()
-                .increment("event:" + eventId + ":coupon:issued", 1)
-                .flatMap(currentIssued -> Mono.zip(maxCouponAmount, Mono.just(currentIssued)))
-                .flatMap(tuple -> {
-                    Long max = tuple.getT1();
-                    Long issued = tuple.getT2();
+                .set(
+                        CouponRedisKey.request(requestId),
+                        value,
+                        Duration.ofHours(1)
+                )
+                .then(
+                        checkAndReserve(
+                                eventId,
+                                userId,
+                                requestId
+                        )
+                )
+                .flatMap(result -> {
 
-                    if (issued > max) {
-                        // 롤백
-                        return reactiveRedisTemplate.opsForValue()
-                                .decrement("event:" + eventId + ":coupon:issued", 1)
-                                .then(Mono.error(new IllegalStateException("쿠폰 수량 초과")));
+                    if (result == -2L) {
+                        return Mono.error(
+                                new IllegalStateException(
+                                        "이벤트 쿠폰 수량 정보가 없습니다."
+                                )
+                        );
                     }
 
-                    return issueCoupon(eventId, couponRequest)
-                            .onErrorResume(ex -> reactiveRedisTemplate.opsForValue()
-                                    .decrement("event:" + eventId + ":coupon:issued", 1)
-                                    .then(Mono.error(ex)));
+                    if (result == -1L) {
+                        return Mono.just(
+                                CouponReqResponse.duplicate(
+                                        requestId
+                                )
+                        );
+                    }
+
+                    if (result == 0L) {
+                        return Mono.just(
+                                CouponReqResponse.fail(
+                                        requestId
+                                )
+                        );
+                    }
+
+                    return Mono.just(
+                            CouponReqResponse.success(
+                                    requestId
+                            )
+                    );
                 });
     }
 
-    // 쿠폰을 DB에 저장하는 로직
-    private Mono<CouponResponse> issueCoupon(Long eventId, CouponRequest dto) {
-        String code = CouponCodeGenerator.generateCouponCode(16);
-        String description = dto.description();
-        LocalDate expirationDate = LocalDate.now().plusDays(dto.duration());
+    private Mono<Long> checkAndReserve(
+            Long eventId,
+            Long userId,
+            String requestId
+    ) {
 
-        return couponRepository.existsByEventIdAndCode(eventId, code)
-                .flatMap(exists -> {
-                    if (exists) {
-                        return issueCoupon(eventId, dto); // 재귀 재시도
-                    } else {
-                        Coupon coupon = Coupon.of(eventId, code, description, expirationDate);
-                        return couponRepository.save(coupon)
-                                .map(CouponResponse::fromEntity);
-                    }
-                });
+        return reactiveRedisTemplate.execute(
+                couponReserveScript,
+                List.of(
+                        CouponRedisKey.users(eventId),
+                        CouponRedisKey.issued(eventId),
+                        CouponRedisKey.max(eventId),
+                        CouponRedisKey.queue(eventId)
+                ),
+                userId.toString(),
+                requestId
+        ).next();
     }
-
-
 }
