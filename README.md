@@ -23,7 +23,7 @@
 | ![Docker](https://img.shields.io/badge/Docker-2496ED.svg?&logo=docker&logoColor=white) | ![Debezium](https://img.shields.io/badge/Debezium-91D443.svg?&logo=debezium&logoColor=white) | ![K6](https://img.shields.io/badge/K6-7D64FF.svg?&logo=k6&logoColor=white) |
 
 # 시스템 아키텍쳐 <a id="시스템-아키텍쳐"> 
-<img width="1692" height="929" alt="시스템 아키텍처" src="https://github.com/user-attachments/assets/d8fe401c-20a9-45e8-bac9-70a3db836f8e" />
+<img width="1434" height="806" alt="선착순SA" src="https://github.com/user-attachments/assets/cc911d2f-9dc2-4c83-8824-9d80a57d6301" />
 
 
 
